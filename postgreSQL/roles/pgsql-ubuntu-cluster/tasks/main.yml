@@ -1,0 +1,112 @@
+  - name: Add an Apt signing key, Is at the URL
+    apt_key:
+      url: "{{ pgsql_key }}"
+      state: present
+      
+  - name: Add ubuntu (apt) repository into sources list using specified pgdg.list.
+    apt_repository:
+      repo: "{{pgSql_repo}}"
+      state: present
+      filename: pgdg
+      update_cache: yes
+      
+  - name: Upgrade all packages to the latest version
+    apt:
+      name: "*"
+      state: latest
+      
+  - name: Install Postgresql latest version
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      allow_unauthenticated: yes
+      state: present
+    loop:
+      - postgresql-{{ postgresql_version }}
+      - postgresql-contrib-{{ postgresql_version }}
+      - python3
+      - python3-pip
+      - libpq-dev
+      - python3-psycopg2
+
+  - name: Restart service postgresql, in all cases
+    service:
+      name: postgresql
+      enabled: yes
+    
+  - name: "Stage 2: check cluster directory"
+    stat: path={{ postgresql_data_dir }}/postgresql.conf
+    register: postgresql_data_stat
+
+#  - name: "Stage 2: initialize new postgresql cluster"
+#    become: yes
+#    become_user: "{{ postgresql_admin_user }}"
+#    command: "{{ postgresql_exec_dir }}/initdb -D {{ postgresql_data_dir }}"
+#    when: postgresql_data_stat.stat.exists == False
+
+  - name: The PostgreSQL master conf file copy 
+    template:
+      src: postgresql.conf
+      dest: "{{ postgresql_conf_dir }}/postgresql.conf"
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      mode: '0600'
+  - name: Create archive directory
+    file:
+      path: "{{postgresql_arch_dir}}"
+      mode: '0700'
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      state: directory
+  - name: Update pg_hba.conf
+    template:
+      src: pg_hba.conf
+      dest: "{{ postgresql_conf_dir }}/pg_hba.conf"
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      mode: '0600'
+  - name: Restart PostgreSQL server
+    service:
+      name: "{{postgresql_service_name}}"
+      enabled: yes
+      state: restarted
+  - name: crate replication user 
+    postgresql_user:
+      name: "{{postgresql_streaming_user.name}}"
+      password: "{{ postgresql_streaming_user.pass }}"
+      role_attr_flags: LOGIN,REPLICATION
+      encrypted: True
+    become_user: "{{ postgresql_admin_user }}"
+
+  - name: create DB
+    become: yes
+    become_user: "{{postgresql_admin_user}}"
+    postgresql_db: 
+      name: "{{postgresql_database_name}}"
+
+  - name: Creating postgres user for "{{postgresql_database_name}}"
+    become: yes
+    become_user: postgres
+    postgresql_user:
+      db: "{{postgresql_database_name}}"
+      name: "{{postgresql_database_user.name}}"
+      password: "{{postgresql_database_user.pass}}"
+      role_attr_flags: "{{role_attr_user_flags}}"
+      priv: "{{user_privilages}}" 
+
+  - name: Ensure we have access from the new user
+    become: yes
+    become_user: "{{postgresql_admin_user}}"
+    postgresql_privs:
+      db: "{{postgresql_database_name}}"
+      role: "{{postgresql_database_user.name}}"
+      objs: ALL_IN_SCHEMA
+      privs: "{{user_privilages}}"
+
+  - name: crating table in DataBase "{{postgresql_database_name}}"
+    become: yes
+    become_user: "{{postgresql_admin_user}}"
+    postgresql_table:
+      db: "{{postgresql_database_name}}"
+      name: "{{DB_table_name}}"
+      columns: "{{DB_table_columns}}" 

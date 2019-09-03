@@ -1,0 +1,21 @@
+---
+
+- name: standalone postgresql
+
+  hosts: pgsql-standalone
+
+  become: yes
+  become_user: root
+
+  tasks:
+   - import_role:
+       name: pgsql-ubuntu-standalone
+     when: ansible_distribution == 'Ubuntu'
+
+   - import_role:
+       name: pgsql-centos-standalone
+     when: ansible_distribution == 'CentOS'
+
+   - import_role:
+       name: pgsql-redhat-standalone
+     when: ansible_distribution == 'RedHat'

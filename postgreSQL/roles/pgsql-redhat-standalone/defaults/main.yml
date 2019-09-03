@@ -1,0 +1,37 @@
+---
+
+# mention verison of postgres latest or required version 
+postgresql_version: 9.6
+
+pgSql_repo: https://oracle-apex-packages-repo.s3-us-west-1.amazonaws.com/PostgreSQL-Database/pgdg-redhat-repo-latest.noarch.rpm
+
+# its an default postgres user to acces pgsql
+postgresql_admin_user: "postgres"
+
+postgresql_database_name: Sample_DB
+
+# Enable some options for streaming replication purposes
+postgresql_database_user:
+  name: cloudSeals
+  pass: Cloud123@
+
+# passing role attributes for user 
+role_attr_user_flags: CREATEDB,NOSUPERUSER
+
+# providing privilages for user
+user_privilages: ALL
+
+# pass the name to create database table 
+DB_table_name: test_table
+
+DB_table_columns: test varchar(100)
+
+postgresql_initdb_name: postgresql{{ postgresql_version | replace('.', '') }}
+postgresql_service_name: postgresql-{{ postgresql_version }}
+postgresql_data_dir: /var/lib/pgsql/{{ postgresql_version }}/data
+postgresql_data_backup_dir: /var/lib/pgsql/{{ postgresql_version }}/data_backup
+postgresql_conf_dir: /var/lib/pgsql/{{ postgresql_version }}/data
+postgresql_exec_dir: /usr/pgsql-{{ postgresql_version }}/bin
+
+postgresql_arch_dir: /var/lib/pgsql/{{ postgresql_version }}/archive
+
