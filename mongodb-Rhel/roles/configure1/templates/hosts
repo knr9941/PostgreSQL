@@ -1,0 +1,6 @@
+     {{ config_servers }}      configsvr1
+     {{ mongos_server }}       mongos
+     {{ shard_1 }}      shardsvr1
+     {{ shard_2 }}      shardsvr2       
+
+

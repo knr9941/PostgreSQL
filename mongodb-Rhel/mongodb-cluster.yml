@@ -1,0 +1,38 @@
+
+---
+
+- name: mongo config server
+
+  hosts: config servers
+
+  become: yes
+
+  tasks:
+
+  - import_role:
+
+      name: configure1
+
+- name: mongo shared1 server
+
+  hosts: shared servers1
+
+  become: yes
+
+  tasks:
+
+  - import_role:
+
+      name: shardreplica1
+
+- name: mongo shared2 server
+
+  hosts: shared servers2
+
+  become: yes
+
+  tasks:
+
+  - import_role:
+
+      name: shardreplica2

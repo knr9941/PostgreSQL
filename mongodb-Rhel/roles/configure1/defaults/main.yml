@@ -1,0 +1,19 @@
+
+base_url: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+
+gpg_key: https://www.mongodb.org/static/pgp/server-4.0.asc
+
+pem_key: apex-1.pem
+
+root_path: /home/ec2-user
+
+sshdir: /home/ec2-user/.ssh
+
+config_servers:                 #Config server(Master) ip
+mongos_server:                  #Mongo host ip
+shard_1:            #Replication server ip
+shard_2:          #Replication ip address
+
+
+
+

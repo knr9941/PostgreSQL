@@ -1,0 +1,16 @@
+
+---
+
+- name: Mongodb deployment
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+  - import_role:
+
+      name: mongodb-standalone 
+
+      

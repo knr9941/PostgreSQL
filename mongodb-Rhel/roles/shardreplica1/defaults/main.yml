@@ -1,0 +1,15 @@
+
+
+
+base_url: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+gpg_key: https://www.mongodb.org/static/pgp/server-4.0.asc
+
+pem_key:   #pem file name
+root_path: /home/ec2-user
+
+sshdir: /home/ec2-user/.ssh
+
+config_servers: 172.31.25.249
+mongos_server: 172.31.30.108
+shard_1: 172.31.17.145
+shard_2: 172.31.17.145
