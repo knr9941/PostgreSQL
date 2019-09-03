@@ -1,0 +1,82 @@
+  - name: Add an Apt signing key, Is at the URL
+    apt_key:
+      url: "{{ pgsql_key }}"
+      state: present
+      
+  - name: Add ubuntu (apt) repository into sources list using specified pgdg.list.
+    apt_repository:
+      repo: "{{pgSql_repo}}"
+      state: present
+      filename: pgdg
+      update_cache: yes
+      
+  - name: Upgrade all packages to the latest version
+    apt:
+      name: "*"
+      state: latest
+      
+  - name: Install Postgresql latest version
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      allow_unauthenticated: yes
+      state: present
+    loop:
+      - postgresql-{{ postgresql_version }}
+      - postgresql-contrib-{{ postgresql_version }}
+      - python3
+      - python3-pip
+      - libpq-dev
+      - python3-psycopg2
+
+  - name: Restart and Enableing service postgresql, in all cases
+    service:
+      name: postgresql
+      enabled: yes
+
+  - name: Stop PostgreSQL slave server 
+    service:
+      name: "{{postgresql_service_name}}"
+      state: stopped
+  - name: Remove old files foo
+    file: path={{postgresql_data_backup_dir}} state=absent
+  - name: checking files
+    stat: 
+      path: "{{postgresql_data_dir}}"
+    register: foo_stat
+
+  - name: Move foo to bar
+    shell: 'mv  "{{postgresql_data_dir}}" "{{postgresql_data_backup_dir}}"'
+    when: foo_stat.stat.exists
+    ignore_errors: yes
+
+  - name: Create data directory slave 
+    file:
+      path: "{{postgresql_data_dir}}"
+      mode: '0700'
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      state: directory
+  
+  - name: Backup initial data from master
+    become_user: root
+    shell: su - postgres -c 'PGPASSWORD={{postgresql_streaming_user.pass}} pg_basebackup -h {{ masterIPS }} -U {{postgresql_streaming_user.name}} -D {{postgresql_data_dir}} -P'
+
+  - name: Update postgresql.conf file 
+    template:
+      src: postgresql.conf
+      dest: "{{ postgresql_conf_dir }}/postgresql.conf"
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      mode: '0600'
+  - name: Create recovery.conf
+    template:
+      src: recovery.conf
+      dest: "{{ postgresql_data_dir }}/recovery.conf"
+      owner: "{{ postgresql_admin_user }}"
+      group: "{{ postgresql_admin_user }}"
+      mode: '0600'
+  - name: Start PostgreSQL server
+    service:
+      name: "{{postgresql_service_name}}"
+      state: restarted

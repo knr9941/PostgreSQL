@@ -1,0 +1,45 @@
+---
+# Install and setup PostgreSQL with Streaming Replication
+- hosts: pg-master
+  tasks:
+  - set_fact: nodetype=master
+  - group_by: key={{ nodetype }}
+
+- hosts: pg-slaves
+  tasks:
+  - set_fact: nodetype=slaves
+  - group_by: key={{ nodetype }}
+
+- hosts: master
+  become: yes
+  become_user: root
+  
+  tasks:
+   - import_role:
+       name: pgsql-ubuntu-cluster
+     when: ansible_distribution == 'Ubuntu'
+
+   - import_role:
+       name: pgsql-centos-cluster
+     when: ansible_distribution == 'CentOS'
+
+   - import_role:
+       name: pgsql-redhat-cluster
+     when: ansible_distribution == 'RedHat'
+  
+- hosts: slaves
+  become: yes
+  become_user: root
+  
+  tasks:
+   - import_role:
+       name: pgsql-ubuntu-nodesconfig
+     when: ansible_distribution == 'Ubuntu'
+
+   - import_role:
+       name: pgsql-centos-nodesconfig
+     when: ansible_distribution == 'CentOS'
+
+   - import_role:
+       name: pgsql-redhat-nodesconfig
+     when: ansible_distribution == 'RedHat'
