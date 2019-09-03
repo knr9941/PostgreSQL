@@ -1,0 +1,19 @@
+
+
+  - name: "python installation"
+    yum: name=python-pip state=present
+  - name: pymongo installation
+    pip: name=pymongo state=present
+  - name: Check if some user is not there already - try to get user list as anonymous
+    shell: /bin/mongo --eval 'db.getUsers()' admin
+    ignore_errors: true
+    register: getusers
+    changed_when: false
+  - name: Run without authentication
+    mongodb_user:
+      database: admin
+      name: "dba"
+      password: "123456"
+      state: present
+      roles: "userAdminAnyDatabase"
+    when: getusers.rc ==0

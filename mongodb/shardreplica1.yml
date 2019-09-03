@@ -1,0 +1,19 @@
+---
+
+- name: mongo config server
+
+  hosts: all
+
+  become: yes
+
+  tasks:
+
+  - import_role:
+
+      name: shardreplica1
+# - hosts: mongo_servers
+ #  tasks:
+  # - include: roles/shardrelica1/tasks/shards.yml
+
+
+

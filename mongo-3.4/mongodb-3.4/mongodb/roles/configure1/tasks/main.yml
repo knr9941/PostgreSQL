@@ -1,0 +1,66 @@
+- name: Creates directory
+  file:
+     path: "{{ sshdir }}"
+
+     state: directory
+
+- name: Ansible create file with content example
+
+  copy:
+
+     dest: "{{ sshdir }}/{{ pem_key }}"
+
+     content: |
+
+         {{ lookup('file',"{{ pem_key }}") }}
+
+     mode: 0777
+
+- name: added ssh-agent
+  shell:  echo "Identityfile {{ sshdir }}/{{ pem_key }}" | sudo tee -a /etc/ssh/ssh_config
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+- name: Add repository
+  yum_repository:
+      name: MongoDB-Repository
+      description: EPEL YUM repo
+      baseurl: "{{ base_url }}"
+      gpgcheck: yes
+      gpgkey: "{{ gpg_key }}"
+      enabled: yes
+
+- name: install MangoDB
+  yum: 
+    name: mongodb-org
+    state: present
+- name: copy host file
+  template:
+       src: hosts
+       dest: /etc/hosts
+
+- name: Install config
+  template:
+       src=mongod.conf
+       dest=/etc/mongod.conf
+       mode=0644
+- name: Create the file to initialize the mongod replica set
+  template: src=initiate.js dest=/tmp/initiate.js
+
+- name: creates db1
+  file:
+     path: /data/db1
+     state: directory
+     owner: mongod
+     group: mongod
+     mode: 0777
+- name: start the mongo
+  service:
+    name: mongod 
+    state: started
+- name: check mongodb command
+  command: sudo netstat -plntu
+
+- name: creating replication
+  shell: mongo --host {{ config_server }} /tmp/initiate.js

@@ -1,0 +1,9 @@
+
+
+
+
+root_path: /home/ec2-user
+
+sshdir: /home/ec2-user/.ssh
+
+password: Root@123

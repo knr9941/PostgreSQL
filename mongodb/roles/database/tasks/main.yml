@@ -1,0 +1,21 @@
+  
+
+  - name: enable epel-release
+    get_url: url=http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm dest=/home/ec2-user
+  - name: install pythan
+    yum: name=python-pip state=present
+  - name: Install the latest pymongo package
+    pip: name=pymongo state=latest use_mirrors=no
+
+  - name: add the admin user
+    mongodb_user: database=admin name=admin password=admin state=present
+    ignore_errors: yes
+  - name: copy the test.j2 file
+    template: src=test.j2 dest=/tmp/test.js
+
+  - name: Execute the collection creation script in perticular database
+    command: /usr/bin/mongo -u admin -p admin /tmp/test.js
+
+
+
+

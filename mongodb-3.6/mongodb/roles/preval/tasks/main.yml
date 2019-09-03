@@ -1,0 +1,85 @@
+- name: mango configuration file exists or not
+  stat:
+      path: /etc/mongod.conf
+  register: conf
+- debug:
+     msg: file not exist
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ conf }}"
+
+- name: check mongod file exists or not
+  stat:
+      path: /usr/bin/mongod
+  register: mongod
+- debug:
+     msg: file not exist
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ mongod }}"
+
+
+- name:  check import file exists or not
+  stat:
+      path: /usr/bin/mongoimport
+  register: mongoimport
+- debug:
+     msg: file not exist
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ mongoimport }}"
+
+
+- name:  check mongo file exists or not
+  stat:
+      path: /usr/bin/mongos
+  register: file_details3
+- debug:
+     msg: file not exist
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details3 }}"
+
+
+- name:  check mongodb log file exists or not
+  stat:
+      path: /var/log/mongodb
+  register: file_details4
+- debug:
+     msg: file not exist
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details4 }}"
+
+
+- name:  check mongo lib file exists or not
+  stat:
+      path: /var/lib/mongo
+  register: file_details5
+- debug:
+     msg: file not exist
+
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details5 }}"
+
+
+- name: check cpu core
+  command: nproc --all
+  register: core_count
+
+- debug: msg="core count {{core_count.stdout}}"
+
+- name: check memory info
+  command: free -m
+  register: memory_info
+- name: memory_info as variable
+  set_fact:
+     one_fact: "{{memory_info}}"
+- name: to show the output
+  debug:
+     msg: "{{memory_info}}"
+
+#- debug: var=ansible_memory_mb
+#- debug: msg="total RAM is {{ ansible_memory_mb.real.total }}"
+

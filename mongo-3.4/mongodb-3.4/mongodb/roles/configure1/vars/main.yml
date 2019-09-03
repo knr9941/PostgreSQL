@@ -1,0 +1,10 @@
+root_path: /home/ec2-user
+
+sshdir: /home/ec2-user/.ssh
+
+config_servers: 172.31.19.109,172.31.28.116
+mongos_server: 172.31.14.203
+shard_1: 172.31.30.140
+shard_2: 172.31.2.46
+
+

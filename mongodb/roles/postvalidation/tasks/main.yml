@@ -1,0 +1,42 @@
+- name: mango configuration file exists or not
+  stat:
+      path: /etc/mongod.conf
+  register: conf
+- debug:
+     msg: "The file or directory exists"
+  when: conf.stat.exists
+- name: check file exists or not
+  stat:
+      path: /usr/bin/mongod 
+  register: mongod
+- debug:
+      msg: "The mongod exists"
+  when: mongod.stat.exists
+- name:  check file exists or not
+  stat:
+      path: /usr/bin/mongoimport
+  register: mongoimport
+- debug:
+      msg: "mongoimport files exists"
+  when: mongoimport.stat.exists
+- name:  check file exists or not
+  stat:
+      path: /usr/bin/mongos
+  register: mongos
+- debug:
+      msg: "mongos directory exists"
+  when: mongos.stat.exists
+- name:  check file exists or not
+  stat:
+      path: /var/log/mongodb
+  register: mongodb
+- debug:
+     msg: "mongodb exists"
+  when: mongodb.stat.exists
+- name:  check file exists or not
+  stat:
+      path: /var/lib/mongo
+  register: mongo
+- debug:
+     msg: "mongo file exists"
+  when: mongo.stat.exists

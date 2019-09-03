@@ -1,0 +1,7 @@
+
+
+
+base_url:  https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/ 
+gpg_key: https://www.mongodb.org/static/pgp/server-3.6.asc
+
+pem_key: apex-1.pem

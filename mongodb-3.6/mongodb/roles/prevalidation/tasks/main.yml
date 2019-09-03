@@ -1,0 +1,73 @@
+- name: mango configuration file exists or not
+  stat:
+      path: /etc/mongod.conf
+  register: conf
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ conf }}"
+- fail: msg="conf file is already exists"
+  when: conf.stat.exists == True
+- name: check mongod file exists or not
+  stat:
+      path: /usr/bin/mongod 
+  register: mongod
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ mongod }}"
+- fail: msg="mongod file is already exists"
+  when: mongod.stat.exists == True
+
+- name:  check import file exists or not
+  stat:
+      path: /usr/bin/mongoimport
+  register: mongoimport
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ mongoimport }}"
+- fail: msg="import file is already exists"
+  when: mongoimport.stat.exists == True
+
+- name:  check mongo file exists or not
+  stat:
+      path: /usr/bin/mongos
+  register: file_details3
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details3 }}"
+- fail: msg="mongos file is already exists"
+  when: file_details3.stat.exists == True
+
+- name:  check mongodb log file exists or not
+  stat:
+      path: /var/log/mongodb
+  register: file_details4
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details4 }}"
+- fail: msg="mongodb file is exists"
+  when: file_details4.stat.exists == True
+
+- name:  check mongo lib file exists or not
+  stat:
+      path: /var/lib/mongo
+  register: file_details5
+
+- name: filed is saved in variable
+  set_fact:
+      one_fact: "{{ file_details5 }}"
+- fail: msg="mongo lib file is already exists"
+  when: file_details5.stat.exists == True
+
+- name: check cpu core
+  command: nproc --all
+  register: core_count
+
+- debug: msg="core count {{core_count.stdout}}"
+- fail: msg="core count is not supported"
+  when: core_count.stdout <2
+
+- debug: var=ansible_memory_mb
+- debug: msg="total RAM is {{ ansible_memory_mb.real.total }}"
+- fail: msg="not enough RAM"
+  when: ansible_memory_mb.real.total <4000
+
